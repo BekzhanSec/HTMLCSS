@@ -22,6 +22,13 @@
   --muted:#9fb8bc; --line:#274a50;
 }
 *{box-sizing:border-box;}
+
+/* Беттің оңға шығып кетуін шектеу */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 html{scroll-padding-top: calc(70px + env(safe-area-inset-top,0px));}
 body{
   margin:0; background:var(--bg); color:var(--ink);
@@ -41,14 +48,19 @@ main{max-width:880px; margin:0 auto; padding:24px 16px 60px;}
 section{margin-bottom:44px;}
 h2{color:var(--accent); border-bottom:2px solid var(--line); padding-bottom:8px; font-size:1.4rem;}
 h3{color:var(--ink); font-size:1.1rem;}
-.card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin:14px 0; box-shadow:0 2px 10px rgba(0,0,0,.04);}
+.card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin:14px 0; box-shadow:0 2px 10px rgba(0,0,0,.04); max-width: 100%;}
+
+/* pre және code адаптивтілігі */
 code, pre{font-family:Consolas,Menlo,monospace;}
-pre{background:#0f2226; color:#c9f2ee; padding:14px; border-radius:10px; overflow-x:auto; font-size:.85rem;}
+pre{
+  background:#0f2226; color:#c9f2ee; padding:14px; border-radius:10px; font-size:.85rem;
+  max-width:100%; overflow-x:auto; white-space:pre-wrap; word-break:break-all;
+}
 :root[data-theme="dark"] pre, :root:not([data-theme="light"]) pre{background:#081418;}
 .tag{color:#f0b84f;} .attr{color:#5fc3cf;} .str{color:#a3e6a3;} .prop{color:#ffb0d0;}
 .grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
 @media(max-width:640px){.grid{grid-template-columns:1fr;}}
-.demo-box{border:1px solid var(--line); border-radius:10px; padding:14px; background:var(--bg);}
+.demo-box{border:1px solid var(--line); border-radius:10px; padding:14px; background:var(--bg); max-width: 100%;}
 button.opt{
   border:1px solid var(--accent); background:transparent; color:var(--accent);
   padding:6px 14px; border-radius:20px; cursor:pointer; font-size:.85rem; margin:4px 4px 0 0;
@@ -64,12 +76,22 @@ button.opt.active, button.opt:hover{background:var(--accent); color:#fff;}
 .cls-select{color:#1b8a1b; font-weight:bold;}
 .id-select{color:#a33; font-size:1.2em; font-weight:bold;}
 :root[data-theme="dark"] .el-select{background:#1c3d42;}
-table{width:100%; border-collapse:collapse; margin:10px 0; font-size:.9rem;}
+
+/* Кестелердің экранға сыюын қамтамасыз ету */
+table{
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: .9rem;
+  white-space: nowrap;
+}
 th,td{border:1px solid var(--line); padding:8px 10px; text-align:left;}
 th{background:var(--accent); color:#fff;}
 .top{position:fixed; bottom:calc(16px + env(safe-area-inset-bottom,0px)); right:16px; background:var(--accent); color:#fff; border-radius:50%; width:42px; height:42px; display:flex; align-items:center; justify-content:center; text-decoration:none; box-shadow:0 3px 10px rgba(0,0,0,.2);}
 .footer{text-align:center; color:var(--muted); font-size:.85rem; padding:20px;}
-
 
 .tabbar{display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;}
 .tabbtn{border:2px solid #fff; background:rgba(255,255,255,.12); color:#fff; padding:7px 18px; border-radius:20px; cursor:pointer; font-size:.95rem; font-weight:bold;}
@@ -84,8 +106,14 @@ th{background:var(--accent); color:#fff;}
 .editor-area{width:100%; border:none; border-radius:0; resize:vertical; background:var(--card); color:var(--ink); font-family:Consolas,Menlo,monospace; font-size:.9rem; padding:12px; display:block;}
 .editor-area:focus{outline:none;}
 iframe{width:100%; display:block;}
-#lab{width:92vw; max-width:1200px; margin-left:50%; transform:translateX(-50%);}
 
+/* Лаборатория бөлімінің енін телефонға икемдеу */
+#lab{
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  transform: none;
+}
 </style>
 </head>
 <body>
@@ -113,14 +141,12 @@ iframe{width:100%; display:block;}
     <a href="#htable">Кесте</a>
     <a href="#hlink">Сілтеме</a>
     <a href="#hmedia">Мультимедиа</a>
-    
     <a href="#hquiz">Тест</a>
   </nav>
 </header>
 
 <main>
 <div id="cssTab">
-
 
 <section id="not">
   <h2>1. CSS дегеніміз не?</h2>
@@ -246,10 +272,8 @@ iframe{width:100%; display:block;}
   </div>
 </section>
 
-
 </div>
 <div id="htmlTab" style="display:none;">
-
 
 <section id="hnot">
   <h2>1. HTML дегеніміз не?</h2>
@@ -414,7 +438,6 @@ iframe{width:100%; display:block;}
   </div>
 </section>
 
-
 </div>
 <div id="labTab" style="display:none;">
 <section id="lab">
@@ -455,7 +478,6 @@ function showTab(tab){
   if(tab==='lab'){ applyLab(); }
   window.scrollTo({top:0,behavior:'smooth'});
 }
-
 
 const styleTypes = {
   embed: {
@@ -540,8 +562,6 @@ function setBorder(style, btn){
   }catch(e){console.error(e);}
 }
 
-
-
 const partsH = {
   html: 'Барлық құжат <code>&lt;html&gt;</code> тегімен басталып, <code>&lt;/html&gt;</code> тегімен аяқталады. Ол браузерге бұл — HTML беті екенін білдіреді.',
   head: '<code>&lt;head&gt;</code> ішінде құжат туралы қызметтік мәлімет (тақырып, кодировка, стильдер) орналасады, ол экранда тікелей көрінбейді.',
@@ -577,7 +597,6 @@ function setListH(type, btn){
   document.querySelectorAll('#hformat .card > .demo-box:last-of-type .opt').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
 }
-
 
 const quizDataH = [
   {q:'HTML не үшін қолданылады?', opts:['Дерекқорды басқару үшін','Веб-беттерді белгілеу үшін','Суретті өңдеу үшін','Дыбыс жазу үшін'], correct:1},
@@ -618,7 +637,6 @@ function checkQuizH(){
   }catch(e){console.error(e);}
 }
 renderQuizH();
-
 
 var labFiles = {
   html: '<h3>Сәлем, әлем!</h3>\n<p class="lead">Мен HTML тегтерімен жазылдым.</p>\n<ul>\n  <li>Бірінші тармақ</li>\n  <li>Екінші тармақ</li>\n</ul>\n<button>Батырма</button>',
