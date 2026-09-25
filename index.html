@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Web негіздері: CSS + HTML — интерактивті сабақ</title>
+<style>
+:root{
+  --bg:#f4f7f8; --card:#ffffff; --ink:#12323a; --accent:#1b6d78; --accent2:#e8a33d;
+  --muted:#5c7a80; --line:#dbe6e8;
+  padding-top: env(safe-area-inset-top,0px);
+  padding-bottom: env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f2226; --card:#15343a; --ink:#eaf4f4; --accent:#5fc3cf; --accent2:#f0b84f;
+    --muted:#9fb8bc; --line:#274a50;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f2226; --card:#15343a; --ink:#eaf4f4; --accent:#5fc3cf; --accent2:#f0b84f;
+  --muted:#9fb8bc; --line:#274a50;
+}
+*{box-sizing:border-box;}
+
+/* Беттің оңға шығып кетуін шектеу */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+html{scroll-padding-top: calc(70px + env(safe-area-inset-top,0px));}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:'Segoe UI',Tahoma,Arial,sans-serif; line-height:1.55;
+}
+header{
+  position:sticky; top:0; z-index:10;
+  padding-top: calc(14px + env(safe-area-inset-top,0px));
+  background:var(--accent); color:#fff; padding:14px 20px;
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+}
+header h1{margin:0; font-size:1.2rem;}
+nav{display:flex; gap:8px; flex-wrap:wrap;}
+nav a{color:#fff; text-decoration:none; font-size:.85rem; padding:6px 10px; border-radius:20px; background:rgba(255,255,255,.15);}
+nav a:hover{background:rgba(255,255,255,.3);}
+main{max-width:880px; margin:0 auto; padding:24px 16px 60px;}
+section{margin-bottom:44px;}
+h2{color:var(--accent); border-bottom:2px solid var(--line); padding-bottom:8px; font-size:1.4rem;}
+h3{color:var(--ink); font-size:1.1rem;}
+.card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px 20px; margin:14px 0; box-shadow:0 2px 10px rgba(0,0,0,.04); max-width: 100%;}
+
+/* pre және code адаптивтілігі */
+code, pre{font-family:Consolas,Menlo,monospace;}
+pre{
+  background:#0f2226; color:#c9f2ee; padding:14px; border-radius:10px; font-size:.85rem;
+  max-width:100%; overflow-x:auto; white-space:pre-wrap; word-break:break-all;
+}
+:root[data-theme="dark"] pre, :root:not([data-theme="light"]) pre{background:#081418;}
+.tag{color:#f0b84f;} .attr{color:#5fc3cf;} .str{color:#a3e6a3;} .prop{color:#ffb0d0;}
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+@media(max-width:640px){.grid{grid-template-columns:1fr;}}
+.demo-box{border:1px solid var(--line); border-radius:10px; padding:14px; background:var(--bg); max-width: 100%;}
+button.opt{
+  border:1px solid var(--accent); background:transparent; color:var(--accent);
+  padding:6px 14px; border-radius:20px; cursor:pointer; font-size:.85rem; margin:4px 4px 0 0;
+}
+button.opt.active, button.opt:hover{background:var(--accent); color:#fff;}
+.border-demo{
+  width:100%; height:90px; border:6px solid var(--accent2); border-radius:6px;
+  display:flex; align-items:center; justify-content:center; font-weight:bold; color:var(--muted);
+  transition:border-style .2s;
+}
+.selector-demo p{margin:4px 0; padding:4px 8px; border-radius:6px;}
+.el-select{background:#dfeef0;}
+.cls-select{color:#1b8a1b; font-weight:bold;}
+.id-select{color:#a33; font-size:1.2em; font-weight:bold;}
+:root[data-theme="dark"] .el-select{background:#1c3d42;}
+
+/* Кестелердің экранға сыюын қамтамасыз ету */
+table{
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: .9rem;
+  white-space: nowrap;
+}
+th,td{border:1px solid var(--line); padding:8px 10px; text-align:left;}
+th{background:var(--accent); color:#fff;}
+.top{position:fixed; bottom:calc(16px + env(safe-area-inset-bottom,0px)); right:16px; background:var(--accent); color:#fff; border-radius:50%; width:42px; height:42px; display:flex; align-items:center; justify-content:center; text-decoration:none; box-shadow:0 3px 10px rgba(0,0,0,.2);}
+.footer{text-align:center; color:var(--muted); font-size:.85rem; padding:20px;}
+
+.tabbar{display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;}
+.tabbtn{border:2px solid #fff; background:rgba(255,255,255,.12); color:#fff; padding:7px 18px; border-radius:20px; cursor:pointer; font-size:.95rem; font-weight:bold;}
+@media(max-width:480px){.tabbtn{padding:6px 12px; font-size:.8rem;} header h1{font-size:1.05rem;}}
+.tabbtn.active{background:#fff; color:var(--accent);}
+.tabnav{display:none;}
+.tabnav.active{display:flex;}
+.editor{border:1px solid var(--line); border-radius:10px; overflow:hidden;}
+.editor-tabs{display:flex; background:var(--bg); border-bottom:1px solid var(--line);}
+.filetab{border:none; background:transparent; color:var(--muted); padding:9px 16px; font-size:.85rem; cursor:pointer; border-right:1px solid var(--line); font-family:Consolas,Menlo,monospace;}
+.filetab.active{background:var(--card); color:var(--accent); font-weight:bold; box-shadow:inset 0 -2px 0 var(--accent);}
+.editor-area{width:100%; border:none; border-radius:0; resize:vertical; background:var(--card); color:var(--ink); font-family:Consolas,Menlo,monospace; font-size:.9rem; padding:12px; display:block;}
+.editor-area:focus{outline:none;}
+iframe{width:100%; display:block;}
+
+/* Лаборатория бөлімінің енін телефонға икемдеу */
+#lab{
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  transform: none;
+}
+</style>
+</head>
+<body>
+<header>
+  <div style="width:100%;">
+    <h1>🌐 Web негіздері: CSS + HTML</h1>
+    <div class="tabbar">
+      <button class="tabbtn active" id="tabBtnCss" onclick="showTab('css')">🎨 CSS сабағы</button>
+      <button class="tabbtn" id="tabBtnHtml" onclick="showTab('html')">📄 HTML сабағы</button>
+      <button class="tabbtn" id="tabBtnLab" onclick="showTab('lab')">🧪 HTML + CSS практика</button>
+    </div>
+  </div>
+  <nav class="tabnav active" id="navCss">
+    <a href="#not">Не ол CSS?</a>
+    <a href="#selector">Селекторлар</a>
+    <a href="#types">Қосу түрлері</a>
+    <a href="#border">Фон/шекара</a>
+    <a href="#font">Қаріп</a>
+    <a href="#quiz">Тест</a>
+  </nav>
+  <nav class="tabnav" id="navHtml">
+    <a href="#hnot">Не ол HTML?</a>
+    <a href="#hstructure">Құрылымы</a>
+    <a href="#hformat">Пішімдеу</a>
+    <a href="#htable">Кесте</a>
+    <a href="#hlink">Сілтеме</a>
+    <a href="#hmedia">Мультимедиа</a>
+    <a href="#hquiz">Тест</a>
+  </nav>
+</header>
+
+<main>
+<div id="cssTab">
+
+<section id="not">
+  <h2>1. CSS дегеніміз не?</h2>
+  <div class="card">
+    <p><b>CSS (Cascading Style Sheets)</b> — веб-беттің сыртқы көрінісін (түс, қаріп, орналасу) басқаратын тіл. HTML бетке "қаңқа" берсе, CSS оған "киім" кигізеді.</p>
+    <p>1994 жылы Хокон Виум Ли енгізген. Артықшылығы: бір CSS файл арқылы жүздеген беттің дизайнын бірден өзгертуге болады.</p>
+    <div class="grid">
+      <div class="demo-box">
+        <p style="font-family:serif; color:#333; margin:0;">Бұл — CSS-сіз қарапайым мәтін.</p>
+      </div>
+      <div class="demo-box" style="background:var(--accent); color:#fff; border-radius:10px;">
+        <p style="font-family:Georgia,serif; font-weight:bold; margin:0;">Бұл — CSS қолданылған мәтін ✨</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="selector">
+  <h2>2. Селекторлар</h2>
+  <div class="card">
+    <p>Селектор — стильдің қай элементке қолданылатынын көрсетеді. 4 негізгі түрі:</p>
+    <table>
+      <tr><th>Түрі</th><th>Жазылуы</th><th>Мысал</th></tr>
+      <tr><td>Элемент бойынша</td><td>тег аты</td><td><code>p { color: black; }</code></td></tr>
+      <tr><td>Класс бойынша</td><td>нүкте <code>.</code></td><td><code>.green { color: green; }</code></td></tr>
+      <tr><td>Идентификатор (id)</td><td>тор <code>#</code></td><td><code>#pink { color: red; }</code></td></tr>
+      <tr><td>Контекстік</td><td>бос орын</td><td><code>p b { color: navy; }</code></td></tr>
+    </table>
+    <p><i>Ескерту: бір бетте бір <b>id</b> тек бір рет қана қолданылады, ал <b>class</b> — шексіз рет.</i></p>
+    <div class="demo-box selector-demo">
+      <p class="el-select">p { } — элемент селекторы (барлық абзацқа әсер етеді)</p>
+      <p class="cls-select">.green — класс селекторы (тек осы класы барларға)</p>
+      <p class="id-select">#pink — идентификатор селекторы (тек бір ғана элементке)</p>
+    </div>
+  </div>
+</section>
+
+<section id="types">
+  <h2>3. Стиль кестелерін қолдану түрлері</h2>
+  <div class="card">
+    <table>
+      <tr><th>Түрі</th><th>Сипаттамасы</th></tr>
+      <tr><td>Браузер стилі</td><td>Бұл – стандартты стиль парағы. Егер белгілі стиль анықталып, берілмесе, онда осы стандарттар қолданылады.</td></tr>
+      <tr><td>Қолданушы стилі</td><td>Кез келген қолданушы браузер параметрін өзгерту арқылы өзінің стиль кестесін жаза алады және қолдана алады.</td></tr>
+      <tr><td>Ендірілген стиль</td><td>Style атрибутын қолдану арқылы анықталады.</td></tr>
+      <tr><td>Кіріктірілген стиль</td><td>HTML құжатының ішінде орналасады.</td></tr>
+      <tr><td>Байланысқан стиль</td><td>Құжатпен link элементінің көмегімен байланысады.</td></tr>
+      <tr><td>Импортталған стиль</td><td>Стильдерді импорттайды.</td></tr>
+    </table>
+
+    <p>Практика: төмендегі батырманы басып, әр стиль түрінің кодын көр:</p>
+    <div style="margin:6px 0 14px;">
+      <button class="opt active" onclick="setStyleType('embed',this)">Ендірілген стиль</button>
+      <button class="opt" onclick="setStyleType('doc',this)">Кіріктірілген стиль</button>
+      <button class="opt" onclick="setStyleType('link',this)">Байланысқан стиль</button>
+    </div>
+    <pre id="typeCode">&lt;<span class="tag">p</span> <span class="attr">style</span>=<span class="str">"font-size: 120%; font-family: monospace; color: #cd66cc"</span>&gt;
+  Абзацқа ішкі CSS стильді қолдану
+&lt;/<span class="tag">p</span>&gt;</pre>
+    <p id="typeDesc">Ендірілген стиль <code>style</code> атрибутында жазылады, тек сол жалғыз элементке ғана әсер етеді. Ол сыртқы стильдер мен құжат деңгейінің стиліне қарағанда жоғары басымдыққа ие.</p>
+  </div>
+</section>
+
+<section id="border">
+  <h2>4. Фон және шекара (border) қасиеттері</h2>
+  <div class="card">
+    <p>Төмендегі батырмаларды басып, <code>border-style</code> қасиетінің әр мәнін өз көзіңмен көр:</p>
+    <div class="demo-box">
+      <div id="borderBox" class="border-demo" style="border-style:solid;">solid</div>
+      <div style="margin-top:10px;">
+        <button class="opt active" onclick="setBorder('solid',this)">solid — тұтас сызық</button>
+        <button class="opt" onclick="setBorder('dashed',this)">dashed — үзік сызық</button>
+        <button class="opt" onclick="setBorder('dotted',this)">dotted — нүктелер</button>
+        <button class="opt" onclick="setBorder('double',this)">double — қос сызық</button>
+      </div>
+    </div>
+    <pre>.box {
+  <span class="prop">border-style</span>: <span id="codeVal">solid</span>;
+  <span class="prop">border-width</span>: 6px;
+  <span class="prop">border-color</span>: #e8a33d;
+}</pre>
+    <table>
+      <tr><th>Қасиеті</th><th>Мағынасы</th></tr>
+      <tr><td><code>background-color</code></td><td>Элементті түспен толтырады</td></tr>
+      <tr><td><code>background-image</code></td><td>Фон ретінде сурет қою (<code>url(...)</code>)</td></tr>
+      <tr><td><code>border-width</code></td><td>Шекараның қалыңдығы</td></tr>
+      <tr><td><code>border-color</code></td><td>Шекараның түсі</td></tr>
+      <tr><td><code>border-style</code></td><td>solid / dashed / dotted / double</td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="font">
+  <h2>5. Қаріп және абзац қасиеттері</h2>
+  <div class="card">
+    <table>
+      <tr><th>Қасиет</th><th>Не істейді</th></tr>
+      <tr><td><code>font-family</code></td><td>Қаріп түрі (Arial, Times...)</td></tr>
+      <tr><td><code>font-size</code></td><td>Қаріп өлшемі</td></tr>
+      <tr><td><code>font-weight</code></td><td>Қалыңдығы: lighter, bold, bolder</td></tr>
+      <tr><td><code>font-style</code></td><td>normal / italic (курсив)</td></tr>
+      <tr><td><code>text-align</code></td><td>Туралау: left, right, center, justify</td></tr>
+      <tr><td><code>text-decoration</code></td><td>none, underline, overline, line-through</td></tr>
+      <tr><td><code>text-transform</code></td><td>uppercase, lowercase, capitalize</td></tr>
+    </table>
+    <div class="grid">
+      <p style="font-weight:bold; text-decoration:underline; margin:0;">font-weight: bold; text-decoration: underline;</p>
+      <p style="font-style:italic; text-transform:uppercase; margin:0;">font-style: italic; text-transform: uppercase;</p>
+    </div>
+  </div>
+  <div class="card">
+    <h3>&lt;div&gt; және &lt;span&gt;</h3>
+    <p><code>&lt;div&gt;</code> — жаңа жолдан бастайды (блок), <code>&lt;span&gt;</code> — сол жолда қалады (жол ішінде). Екеуі де жеке бөлікке стиль беру үшін қолданылады.</p>
+  </div>
+</section>
+
+<section id="quiz">
+  <h2>7. Білімді тексеру</h2>
+  <div class="card">
+    <form id="quizForm"></form>
+    <button class="opt active" onclick="checkQuiz()" type="button">Тексеру</button>
+    <p id="quizResult" style="font-weight:bold; margin-top:10px;"></p>
+  </div>
+</section>
+
+</div>
+<div id="htmlTab" style="display:none;">
+
+<section id="hnot">
+  <h2>1. HTML дегеніміз не?</h2>
+  <div class="card">
+    <p><b>HTML (HyperText Markup Language)</b> — гипермәтінді белгілеу тілі, интернеттегі құжаттарды белгілеудің стандартталған тілі. Браузер HTML кодын интерпретациялап, оны экранда форматталған бет түрінде көрсетеді. Мұндай құжаттардың кеңейтілімі — <code>.htm</code> немесе <code>.html</code>.</p>
+    <p>HTML-дің үш негізгі термині бар: <b>элемент</b>, <b>тег</b> және <b>атрибут</b>.</p>
+    <table>
+      <tr><th>Термин</th><th>Мағынасы</th></tr>
+      <tr><td>Тег</td><td>Қандай операция орындалуы керегін көрсететін команда, бұрыштық жақшамен <code>&lt; &gt;</code> белгіленеді</td></tr>
+      <tr><td>Элемент</td><td>Тег пен оның мазмұнының жиынтығы</td></tr>
+      <tr><td>Атрибут</td><td>Элемент туралы қосымша ақпарат беретін сипаттама</td></tr>
+    </table>
+    <p>Тегтің екі түрі бар: <b>жұп</b> (мысалы, <code>&lt;b&gt;...&lt;/b&gt;</code>) және <b>жұпсыз/дара</b> (мысалы, <code>&lt;br&gt;</code>). Жабылатын тег әрқашан <code>/</code> символынан басталады.</p>
+    <pre>&lt;<span class="tag">hr</span> <span class="attr">align</span>=<span class="str">"right"</span> <span class="attr">size</span>=<span class="str">"3"</span>&gt;</pre>
+    <div class="grid">
+      <div class="demo-box">
+        <p style="margin:0;">Тегсіз жай мәтін — браузер оны реттеусіз көрсетеді.</p>
+      </div>
+      <div class="demo-box" style="background:var(--accent); color:#fff; border-radius:10px;">
+        <p style="margin:0;"><b><i>Тегпен пішімделген мәтін</i></b> ✨</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="hstructure">
+  <h2>2. HTML құжатының құрылымы</h2>
+  <div class="card">
+    <p>Кез келген HTML құжатында міндетті түрде болатын төрт негізгі тег бар:</p>
+    <pre>&lt;<span class="tag">html</span>&gt;
+  &lt;<span class="tag">head</span>&gt;
+    &lt;<span class="tag">title</span>&gt;Беттің тақырыбы&lt;/<span class="tag">title</span>&gt;
+  &lt;/<span class="tag">head</span>&gt;
+  &lt;<span class="tag">body</span>&gt;
+    Құжаттың негізгі мазмұны осында
+  &lt;/<span class="tag">body</span>&gt;
+&lt;/<span class="tag">html</span>&gt;</pre>
+    <p>Батырманы басып, әр бөліктің қызметін көр:</p>
+    <div style="margin:6px 0 14px;">
+      <button class="opt active" onclick="setPartH('html',this)">&lt;html&gt;</button>
+      <button class="opt" onclick="setPartH('head',this)">&lt;head&gt;</button>
+      <button class="opt" onclick="setPartH('title',this)">&lt;title&gt;</button>
+      <button class="opt" onclick="setPartH('body',this)">&lt;body&gt;</button>
+    </div>
+    <div class="demo-box"><p id="partDescH" style="margin:0;">Барлық құжат <code>&lt;html&gt;</code> тегімен басталып, <code>&lt;/html&gt;</code> тегімен аяқталады. Ол браузерге бұл — HTML беті екенін білдіреді.</p></div>
+  </div>
+</section>
+
+<section id="hformat">
+  <h2>3. Мәтінді пішімдеу тегтері</h2>
+  <div class="card">
+    <p><code>&lt;h1&gt;</code>–<code>&lt;h6&gt;</code> тақырып тегтері (H1 — ең үлкен, H6 — ең кіші), <code>&lt;p&gt;</code> — абзац, <code>&lt;hr&gt;</code> — көлденең сызық, <code>&lt;br&gt;</code> — жол ауыстыру.</p>
+    <div class="demo-box">
+      <div id="headingBoxH" class="border-demo" style="font-size:2rem; border-style:none; border-width:0;">Тақырып мәтіні</div>
+      <div style="margin-top:10px;">
+        <button class="opt active" onclick="setHeadingH(1,this)">h1</button>
+        <button class="opt" onclick="setHeadingH(2,this)">h2</button>
+        <button class="opt" onclick="setHeadingH(3,this)">h3</button>
+        <button class="opt" onclick="setHeadingH(4,this)">h4</button>
+        <button class="opt" onclick="setHeadingH(5,this)">h5</button>
+        <button class="opt" onclick="setHeadingH(6,this)">h6</button>
+      </div>
+    </div>
+    <table>
+      <tr><th>Тег</th><th>Қолданылуы</th></tr>
+      <tr><td><code>&lt;p align="left/right/center/justify"&gt;</code></td><td>Абзацты туралайды</td></tr>
+      <tr><td><code>&lt;b&gt;, &lt;strong&gt;</code></td><td>Қою (қалың) қаріп</td></tr>
+      <tr><td><code>&lt;i&gt;, &lt;em&gt;</code></td><td>Курсив</td></tr>
+      <tr><td><code>&lt;u&gt;, &lt;ins&gt;</code></td><td>Асты сызылған мәтін</td></tr>
+      <tr><td><code>&lt;s&gt;, &lt;del&gt;</code></td><td>Сызылған мәтін</td></tr>
+      <tr><td><code>&lt;sub&gt; / &lt;sup&gt;</code></td><td>Төменгі / жоғарғы индекс</td></tr>
+    </table>
+    <p><i>Физикалық форматтау (<code>&lt;b&gt;</code>) шрифт түрін өзгертеді, ал логикалық форматтау (<code>&lt;strong&gt;</code>) іздеу жүйесіне мәтіннің маңыздылығын білдіреді — екеуі браузерде бірдей көрінеді.</i></p>
+
+    <h3>Тізімдер</h3>
+    <p><code>&lt;ul&gt;</code> — маркерленген тізім, <code>&lt;ol&gt;</code> — нөмірленген тізім, <code>&lt;li&gt;</code> — тізім элементі, <code>&lt;dl&gt;/&lt;dt&gt;/&lt;dd&gt;</code> — көпсатылы тізім.</p>
+    <div class="demo-box">
+      <ul id="listDemoH" style="list-style-type:disc; margin:0;">
+        <li>HTML</li><li>CSS</li><li>JavaScript</li>
+      </ul>
+      <div style="margin-top:10px;">
+        <button class="opt active" onclick="setListH('disc',this)">disc</button>
+        <button class="opt" onclick="setListH('circle',this)">circle</button>
+        <button class="opt" onclick="setListH('square',this)">square</button>
+        <button class="opt" onclick="setListH('decimal',this)">1,2,3 (ol)</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="htable">
+  <h2>4. HTML-де кесте құру</h2>
+  <div class="card">
+    <p>Кесте <code>&lt;table&gt;</code> тегімен басталады. <code>&lt;tr&gt;</code> — қатар, <code>&lt;th&gt;</code> — баған тақырыбы (қалыңдатылған), <code>&lt;td&gt;</code> — қарапайым ұяшық.</p>
+    <pre>&lt;<span class="tag">table</span> <span class="attr">border</span>=<span class="str">"1"</span>&gt;
+  &lt;<span class="tag">tr</span>&gt;&lt;<span class="tag">th</span>&gt;Аты&lt;/<span class="tag">th</span>&gt;&lt;<span class="tag">th</span>&gt;Тегі&lt;/<span class="tag">th</span>&gt;&lt;/<span class="tag">tr</span>&gt;
+  &lt;<span class="tag">tr</span>&gt;&lt;<span class="tag">td</span>&gt;Айнұр&lt;/<span class="tag">td</span>&gt;&lt;<span class="tag">td</span>&gt;Исаева&lt;/<span class="tag">td</span>&gt;&lt;/<span class="tag">tr</span>&gt;
+&lt;/<span class="tag">table</span>&gt;</pre>
+    <table>
+      <tr><th>Аты</th><th>Тегі</th></tr>
+      <tr><td>Айнұр</td><td>Исаева</td></tr>
+    </table>
+    <table>
+      <tr><th>Атрибут</th><th>Қызметі</th></tr>
+      <tr><td><code>border</code></td><td>Кесте жиегінің қалыңдығы</td></tr>
+      <tr><td><code>colspan</code></td><td>Бірнеше бағанды біріктіру</td></tr>
+      <tr><td><code>rowspan</code></td><td>Бірнеше жолды біріктіру</td></tr>
+      <tr><td><code>cellpadding</code></td><td>Ұяшық ішіндегі бос орын</td></tr>
+      <tr><td><code>caption</code></td><td>Кестенің тақырыбы (жеке тег)</td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="hlink">
+  <h2>5. HTML тілінде сілтемелер</h2>
+  <div class="card">
+    <p>Сілтеме <code>&lt;a&gt;...&lt;/a&gt;</code> (anchor — якорь) тегімен жасалады.</p>
+    <table>
+      <tr><th>Түрі</th><th>Код мысалы</th></tr>
+      <tr><td>Сыртқы сілтеме</td><td><code>&lt;a href="https://kk.wikipedia.org"&gt;Уикипедия&lt;/a&gt;</code></td></tr>
+      <tr><td>Ішкі сілтеме (якорь)</td><td><code>&lt;a href="#hquiz"&gt;Тестке өту&lt;/a&gt;</code></td></tr>
+      <tr><td>Электрондық пошта</td><td><code>&lt;a href="mailto:a@mail.com"&gt;Пошта&lt;/a&gt;</code></td></tr>
+      <tr><td>Суретті сілтеме</td><td><code>&lt;a href="..."&gt;&lt;img src="..."&gt;&lt;/a&gt;</code></td></tr>
+    </table>
+    <div class="demo-box">
+      <p style="margin:0;">Мысалы, осы батырма — ішкі сілтеме, ол сені осы беттің тесті бар бөліміне апарады: <a href="#hquiz" class="opt" style="display:inline-block; text-decoration:none;">Тестке өту ↓</a></p>
+    </div>
+    <p><i>Үнсіз келісім бойынша сілтеме түстері: <code>link</code> — қаралмаған (көк), <code>vlink</code> — қаралған (күлгін), <code>alink</code> — белсенді (қызыл).</i></p>
+  </div>
+</section>
+
+<section id="hmedia">
+  <h2>6. HTML-де мультимедиа</h2>
+  <div class="card">
+    <p><code>&lt;img src="..."&gt;</code> — сурет кірістіретін жұпсыз тег. Web-те қолданылатын форматтар: <b>GIF, JPG, PNG</b>.</p>
+    <table>
+      <tr><th>Атрибут</th><th>Қызметі</th></tr>
+      <tr><td><code>src</code></td><td>Сурет мекенжайы (міндетті)</td></tr>
+      <tr><td><code>alt</code></td><td>Сурет жүктелмесе шығатын мәтін</td></tr>
+      <tr><td><code>width / height</code></td><td>Ені мен биіктігі</td></tr>
+      <tr><td><code>border</code></td><td>Жақтау қалыңдығы</td></tr>
+    </table>
+    <p><code>&lt;audio&gt;</code> және <code>&lt;video&gt;</code> тегтері дыбыс пен бейнені қосу үшін қолданылады:</p>
+    <pre>&lt;<span class="tag">audio</span> <span class="attr">src</span>=<span class="str">"sound.mp3"</span> <span class="attr">controls</span>&gt;&lt;/<span class="tag">audio</span>&gt;
+&lt;<span class="tag">video</span> <span class="attr">src</span>=<span class="str">"video.mp4"</span> <span class="attr">width</span>=<span class="str">"320"</span> <span class="attr">controls</span>&gt;&lt;/<span class="tag">video</span>&gt;</pre>
+    <table>
+      <tr><th>Атрибут</th><th>Қызметі</th></tr>
+      <tr><td><code>controls</code></td><td>Басқару панелін қосады</td></tr>
+      <tr><td><code>autoplay</code></td><td>Автоматты ойнатады</td></tr>
+      <tr><td><code>loop</code></td><td>Қайталап ойнатады</td></tr>
+      <tr><td><code>poster</code></td><td>(тек video) ойнатылмағанда көрінетін сурет</td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="hquiz">
+  <h2>8. Білімді тексеру</h2>
+  <div class="card">
+    <form id="quizFormH"></form>
+    <button class="opt active" onclick="checkQuizH()" type="button">Тексеру</button>
+    <p id="quizResultH" style="font-weight:bold; margin-top:10px;"></p>
+  </div>
+</section>
+
+</div>
+<div id="labTab" style="display:none;">
+<section id="lab">
+  <h2>🧪 HTML + CSS практика</h2>
+  <div class="card">
+    <p>Төмендегі файл қойындыларының арасында ауысып, <b>index.html</b> мен <b>style.css</b> кодын жаз. <b>«Қолдану»</b> батырмасын бассаң, екеуі бірге қосылып, нәтиже төменде бірден көрінеді.</p>
+    <div class="editor">
+      <div class="editor-tabs">
+        <button class="filetab active" id="fileTabHtml" onclick="switchLabFile('html',this)">📄 index.html</button>
+        <button class="filetab" id="fileTabCss" onclick="switchLabFile('css',this)">🎨 style.css</button>
+      </div>
+      <textarea id="labEditor" class="editor-area" rows="12" spellcheck="false"></textarea>
+    </div>
+    <div style="margin:10px 0;">
+      <button class="opt active" onclick="applyLab()">▶ Қолдану</button>
+      <button class="opt" onclick="resetLab()">↺ Тазалау</button>
+    </div>
+    <h3 style="margin:0 0 6px;">Нәтиже</h3>
+    <iframe id="labPreview" style="height:420px; resize:vertical; overflow:auto;"></iframe>
+  </div>
+</section>
+</div>
+</main>
+
+<button onclick="window.scrollTo({top:0,behavior:'smooth'})" class="top" style="border:none;">↑</button>
+<div class="footer">CSS және HTML сабақтары негізінде дайындалды</div>
+
+<script>
+function showTab(tab){
+  document.getElementById('cssTab').style.display = (tab==='css') ? '' : 'none';
+  document.getElementById('htmlTab').style.display = (tab==='html') ? '' : 'none';
+  document.getElementById('labTab').style.display = (tab==='lab') ? '' : 'none';
+  document.getElementById('tabBtnCss').classList.toggle('active', tab==='css');
+  document.getElementById('tabBtnHtml').classList.toggle('active', tab==='html');
+  document.getElementById('tabBtnLab').classList.toggle('active', tab==='lab');
+  document.getElementById('navCss').classList.toggle('active', tab==='css');
+  document.getElementById('navHtml').classList.toggle('active', tab==='html');
+  if(tab==='lab'){ applyLab(); }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+const styleTypes = {
+  embed: {
+    code: `&lt;<span class="tag">p</span> <span class="attr">style</span>=<span class="str">"font-size: 120%; font-family: monospace; color: #cd66cc"</span>&gt;
+  Абзацқа ішкі CSS стильді қолдану
+&lt;/<span class="tag">p</span>&gt;`,
+    desc: 'Ендірілген стиль <code>style</code> атрибутында жазылады, тек сол жалғыз элементке ғана әсер етеді. Ол сыртқы стильдер мен құжат деңгейінің стиліне қарағанда жоғары басымдыққа ие.'
+  },
+  doc: {
+    code: `&lt;<span class="tag">head</span>&gt;
+  &lt;<span class="tag">style</span>&gt;
+    p { <span class="prop">color</span>: blue; }
+  &lt;/<span class="tag">style</span>&gt;
+&lt;/<span class="tag">head</span>&gt;`,
+    desc: 'Кіріктірілген стиль HTML құжатының &lt;head&gt;...&lt;/head&gt; тегіне қойылатын &lt;style&gt;...&lt;/style&gt; тегінің ішінде жазылады. Барлық құжатқа қолданылады.'
+  },
+  link: {
+    code: `&lt;<span class="tag">link</span> <span class="attr">rel</span>=<span class="str">"stylesheet"</span> <span class="attr">type</span>=<span class="str">"text/css"</span>
+  <span class="attr">href</span>=<span class="str">"стиль_адресі"</span>&gt;`,
+    desc: 'Байланысқан стиль .css кеңейтілімімен бөлек файлда сақталады және link элементінің көмегімен тегпен қосылады. Негізгі артықшылығы: бір стиль HTML-дің бірнеше беттерінде бірден пайдаланылуы мүмкін.'
+  }
+};
+function setStyleType(type, btn){
+  try{
+    document.getElementById('typeCode').innerHTML = styleTypes[type].code;
+    document.getElementById('typeDesc').innerHTML = styleTypes[type].desc;
+    document.querySelectorAll('#types .opt').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }catch(e){console.error(e);}
+}
+
+const quizData = [
+  {q:'CSS деген не?', opts:['Бағдарламалау тілі','Веб-беттің сыртқы көрінісін басқаратын тіл','Дерекқор басқару жүйесі','Сурет өңдеу бағдарламасы'], correct:1},
+  {q:'Класс бойынша селектор қалай жазылады?', opts:['#pink','p b','.green','style="color:red"'], correct:2},
+  {q:'Бір HTML бетте id атрибутын неше рет қолдануға болады?', opts:['Шексіз рет','Тек бір рет','Екі рет','Мүлде болмайды'], correct:1},
+  {q:'border-style: dashed нені білдіреді?', opts:['Тұтас сызық','Нүктелер арқылы сызық','Үзік сызық','Қос тұтас сызық'], correct:2},
+  {q:'Сыртқы стиль html бетке қандай тег арқылы қосылады?', opts:['<style>','<script>','<link>','<meta>'], correct:2},
+  {q:'Ең жоғары басымдыққа қай стиль ие?', opts:['Браузер стилі','Ендірілген (inline) стиль','Кіріктірілген стиль','Байланысқан стиль'], correct:1}
+];
+function escapeHtml(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function renderQuiz(){
+  var form = document.getElementById('quizForm');
+  var html = '';
+  quizData.forEach(function(item, i){
+    html += '<div style="margin-bottom:14px;"><p style="margin:0 0 6px;font-weight:bold;">'+(i+1)+'. '+escapeHtml(item.q)+'</p>';
+    item.opts.forEach(function(opt, j){
+      html += '<label style="display:block; margin:2px 0; cursor:pointer;"><input type="radio" name="q'+i+'" value="'+j+'"> '+escapeHtml(opt)+'</label>';
+    });
+    html += '<span id="fb'+i+'" style="font-size:.85rem;"></span></div>';
+  });
+  form.innerHTML = html;
+}
+function checkQuiz(){
+  try{
+    var score = 0;
+    quizData.forEach(function(item, i){
+      var sel = document.querySelector('input[name="q'+i+'"]:checked');
+      var fb = document.getElementById('fb'+i);
+      if(sel && parseInt(sel.value) === item.correct){
+        score++;
+        fb.textContent = '✅ дұрыс';
+        fb.style.color = '#1b8a1b';
+      } else {
+        fb.textContent = '❌ дұрыс жауабы: ' + item.opts[item.correct];
+        fb.style.color = '#c0392b';
+      }
+    });
+    document.getElementById('quizResult').textContent = 'Нәтиже: ' + score + ' / ' + quizData.length;
+  }catch(e){console.error(e);}
+}
+renderQuiz();
+
+function setBorder(style, btn){
+  try{
+    document.getElementById('borderBox').style.borderStyle = style;
+    document.getElementById('borderBox').textContent = style;
+    document.getElementById('codeVal').textContent = style;
+    document.querySelectorAll('.opt').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }catch(e){console.error(e);}
+}
+
+const partsH = {
+  html: 'Барлық құжат <code>&lt;html&gt;</code> тегімен басталып, <code>&lt;/html&gt;</code> тегімен аяқталады. Ол браузерге бұл — HTML беті екенін білдіреді.',
+  head: '<code>&lt;head&gt;</code> ішінде құжат туралы қызметтік мәлімет (тақырып, кодировка, стильдер) орналасады, ол экранда тікелей көрінбейді.',
+  title: '<code>&lt;title&gt;</code> тегі <code>&lt;head&gt;</code> ішінде тұрады және браузердің қойындысында көрінетін беттің атауын береді.',
+  body: '<code>&lt;body&gt;</code> ішінде браузер көрсететін барлық мазмұн — мәтін, суреттер, кестелер, сілтемелер — орналасады.'
+};
+function setPartH(p, btn){
+  document.getElementById('partDescH').innerHTML = partsH[p];
+  document.querySelectorAll('#hstructure .opt').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function setHeadingH(n, btn){
+  var sizes = {1:'2.2rem',2:'1.9rem',3:'1.6rem',4:'1.3rem',5:'1.1rem',6:'0.95rem'};
+  var box = document.getElementById('headingBoxH');
+  box.style.fontSize = sizes[n];
+  box.textContent = 'h'+n+' — Тақырып мәтіні';
+  document.querySelectorAll('#hformat .opt').forEach(function(b){ if(b.textContent.match(/^h[1-6]$/)) b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+
+function setListH(type, btn){
+  var ul = document.getElementById('listDemoH');
+  if(type === 'decimal'){
+    ul.outerHTML = '<ol id="listDemoH" style="margin:0;"><li>HTML</li><li>CSS</li><li>JavaScript</li></ol>';
+  } else {
+    if(ul.tagName.toLowerCase() !== 'ul'){
+      ul.outerHTML = '<ul id="listDemoH" style="margin:0;"><li>HTML</li><li>CSS</li><li>JavaScript</li></ul>';
+      ul = document.getElementById('listDemoH');
+    }
+    ul.style.listStyleType = type;
+  }
+  document.querySelectorAll('#hformat .card > .demo-box:last-of-type .opt').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+const quizDataH = [
+  {q:'HTML не үшін қолданылады?', opts:['Дерекқорды басқару үшін','Веб-беттерді белгілеу үшін','Суретті өңдеу үшін','Дыбыс жазу үшін'], correct:1},
+  {q:'Төмендегілердің қайсысы — жұп тег мысалы?', opts:['&lt;br&gt;','&lt;hr&gt;','&lt;b&gt;...&lt;/b&gt;','&lt;img&gt;'], correct:2},
+  {q:'Құжаттың негізгі көрінетін мазмұны қай тег ішінде орналасады?', opts:['&lt;head&gt;','&lt;title&gt;','&lt;body&gt;','&lt;html&gt;'], correct:2},
+  {q:'Кестенің бір қатарын анықтайтын тег қайсы?', opts:['&lt;td&gt;','&lt;tr&gt;','&lt;th&gt;','&lt;table&gt;'], correct:1},
+  {q:'Сыртқы сайтқа сілтеме қалай жасалады?', opts:['&lt;link src="..."&gt;','&lt;a href="..."&gt;','&lt;src href="..."&gt;','&lt;url&gt;...&lt;/url&gt;'], correct:1},
+  {q:'Суретті бетке кірістіретін тег қайсы?', opts:['&lt;picture&gt;','&lt;src&gt;','&lt;img&gt;','&lt;image&gt;'], correct:2}
+];
+function renderQuizH(){
+  var form = document.getElementById('quizFormH');
+  var html = '';
+  quizDataH.forEach(function(item, i){
+    html += '<div style="margin-bottom:14px;"><p style="margin:0 0 6px;font-weight:bold;">'+(i+1)+'. '+item.q+'</p>';
+    item.opts.forEach(function(opt, j){
+      html += '<label style="display:block; margin:2px 0; cursor:pointer;"><input type="radio" name="qH'+i+'" value="'+j+'"> '+opt+'</label>';
+    });
+    html += '<span id="fbH'+i+'" style="font-size:.85rem;"></span></div>';
+  });
+  form.innerHTML = html;
+}
+function checkQuizH(){
+  try{
+    var score = 0;
+    quizDataH.forEach(function(item, i){
+      var sel = document.querySelector('input[name="qH'+i+'"]:checked');
+      var fb = document.getElementById('fbH'+i);
+      if(sel && parseInt(sel.value) === item.correct){
+        score++;
+        fb.textContent = '✅ дұрыс';
+        fb.style.color = '#1b8a1b';
+      } else {
+        fb.innerHTML = '❌ дұрыс жауабы: ' + item.opts[item.correct];
+        fb.style.color = '#c0392b';
+      }
+    });
+    document.getElementById('quizResultH').textContent = 'Нәтиже: ' + score + ' / ' + quizDataH.length;
+  }catch(e){console.error(e);}
+}
+renderQuizH();
+
+var labFiles = {
+  html: '<h3>Сәлем, әлем!</h3>\n<p class="lead">Мен HTML тегтерімен жазылдым.</p>\n<ul>\n  <li>Бірінші тармақ</li>\n  <li>Екінші тармақ</li>\n</ul>\n<button>Батырма</button>',
+  css: 'body{\n  font-family: \'Segoe UI\', sans-serif;\n  padding: 10px;\n}\nh3{ color: #1b6d78; }\n.lead{\n  color: #5c7a80;\n  font-style: italic;\n}\nul{ color: #e8a33d; }\nbutton{\n  background: #1b6d78;\n  color: #fff;\n  border: none;\n  padding: 8px 16px;\n  border-radius: 20px;\n  cursor: pointer;\n}'
+};
+var labCurrentFile = 'html';
+
+function switchLabFile(file, btn){
+  try{
+    labFiles[labCurrentFile] = document.getElementById('labEditor').value;
+    labCurrentFile = file;
+    document.getElementById('labEditor').value = labFiles[file];
+    document.getElementById('fileTabHtml').classList.toggle('active', file==='html');
+    document.getElementById('fileTabCss').classList.toggle('active', file==='css');
+  }catch(e){console.error(e);}
+}
+function initLabEditor(){
+  document.getElementById('labEditor').value = labFiles[labCurrentFile];
+}
+function applyLab(){
+  try{
+    labFiles[labCurrentFile] = document.getElementById('labEditor').value;
+    document.getElementById('labPreview').srcdoc = '<style>'+labFiles.css+'</style>'+labFiles.html;
+  }catch(e){console.error(e);}
+}
+function resetLab(){
+  labFiles.html = '';
+  labFiles.css = '';
+  document.getElementById('labEditor').value = '';
+  document.getElementById('labPreview').srcdoc = '';
+}
+initLabEditor();
+</script>
+</body>
+</html>
